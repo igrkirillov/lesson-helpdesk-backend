@@ -6,6 +6,7 @@ import {saveTickets, loadTickets} from "./dataUtils.js";
 
 const app = new Application();
 const tickets = loadTickets() || [];
+let maxId = tickets.reduce((maxId, t) => Math.max(maxId, t.id), 0);
 
 app.use(koaBody({
   urlencoded: true,
@@ -44,7 +45,7 @@ function createTicket(context, next) {
   }
   const { name, status, description } = context.request.body;
   context.response.set('Access-Control-Allow-Origin', '*');
-  tickets.push(new Ticket(uuid.v4(), name, status, description, Date.now()));
+  tickets.push(new Ticket(getNextId(), name, status, description, Date.now()));
   saveTickets(tickets);
   context.response.body = 'OK';
   next();
@@ -125,4 +126,8 @@ function getMethodName(request) {
 
 function getId(request) {
   return request.query && request.query["id"];
+}
+
+function getNextId() {
+  return ++maxId;
 }
