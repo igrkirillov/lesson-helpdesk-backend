@@ -1,12 +1,8 @@
-import * as fs from "fs";
 import * as http from "http";
-import * as Koa from "koa";
+import Application from "koa";
 import {koaBody} from "koa-body";
-import * as path from "path";
-import * as uuid from "uuid";
 import Ticket from "./Ticket.js";
 import {saveTickets, loadTickets} from "./dataUtils.js";
-import Application from "koa";
 
 const app = new Application();
 const tickets = loadTickets() || [];
@@ -14,7 +10,6 @@ const tickets = loadTickets() || [];
 app.use(koaBody({
   urlencoded: true,
   multipart: true,
-
 }));
 app.use((ctx, next) => {
   if (ctx.request.method !== 'OPTIONS') {
@@ -29,6 +24,8 @@ app.use((ctx, next) => {
 app.use(createTicket);
 app.use(updateById);
 app.use(allTickets);
+app.use(ticketById);
+app.use(deleteById);
 
 const server = http.createServer(app.callback());
 const port = process.env.PORT || 7070;
@@ -83,6 +80,42 @@ function allTickets(context, next) {
   context.response.set('Access-Control-Allow-Origin', '*');
   context.response.body = JSON.stringify(tickets);
   context.type = "json";
+  next();
+}
+
+function ticketById(context, next) {
+  if (context.request.method !== 'GET' || getMethodName(context.request) !== "ticketById") {
+    next();
+    return;
+  }
+  const id = getId(context.request);
+  context.response.set('Access-Control-Allow-Origin', '*');
+  const ticket = tickets.find(t => t.id === id);
+  if (!ticket) {
+    context.response.status = 404;
+    context.response.body = 'Not Found';
+  } else {
+    context.response.body = JSON.stringify(ticket);
+    context.type = "json";
+  }
+  next();
+}
+
+function deleteById(context, next) {
+  if (context.request.method !== 'DELETE' || getMethodName(context.request) !== "deleteById") {
+    next();
+    return;
+  }
+  const id = getId(context.request);
+  context.response.set('Access-Control-Allow-Origin', '*');
+  const index = tickets.findIndex(t => t.id === id);
+  if (!index) {
+    context.response.status = 404;
+    context.response.body = 'Not Found';
+  } else {
+    tickets.splice(index, 1);
+    context.response.status = 202;
+  }
   next();
 }
 
