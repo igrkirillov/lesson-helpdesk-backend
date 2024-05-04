@@ -45,9 +45,11 @@ function createTicket(context, next) {
   }
   const { name, status, description } = context.request.body;
   context.response.set('Access-Control-Allow-Origin', '*');
-  tickets.push(new Ticket(getNextId(), name, status, description, Date.now()));
+  const ticket = new Ticket(getNextId(), name, status, description, Date.now());
+  tickets.push(ticket);
   saveTickets(tickets);
-  context.response.body = 'OK';
+  context.response.body = JSON.stringify(ticket);
+  context.type = "json";
   next();
 }
 
@@ -68,7 +70,8 @@ function updateById(context, next) {
     ticket.status = status;
     ticket.description = description;
     saveTickets(tickets);
-    context.response.body = 'OK';
+    context.response.body = JSON.stringify(ticket);
+    context.type = "json";
   }
   next();
 }
@@ -115,6 +118,7 @@ function deleteById(context, next) {
     context.response.body = 'Not Found';
   } else {
     tickets.splice(index, 1);
+    saveTickets(tickets);
     context.response.status = 202;
   }
   next();
@@ -125,7 +129,7 @@ function getMethodName(request) {
 }
 
 function getId(request) {
-  return request.query && request.query["id"];
+  return request.query && +request.query["id"];
 }
 
 function getNextId() {
