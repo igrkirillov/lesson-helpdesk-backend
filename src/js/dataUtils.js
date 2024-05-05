@@ -2,7 +2,10 @@ import * as fs from "fs";
 
 const ticketsPath = "./data/tickets.json";
 export function loadTickets() {
-  return fs.existsSync(ticketsPath) && JSON.parse(fs.readFileSync(ticketsPath).toString());
+  return (
+    fs.existsSync(ticketsPath) &&
+    JSON.parse(fs.readFileSync(ticketsPath).toString())
+  );
 }
 
 export function saveTickets(json) {
