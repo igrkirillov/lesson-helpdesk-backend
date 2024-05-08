@@ -4,7 +4,7 @@ const ticketsPath = "./tickets.json";
 export function loadTickets() {
   return (
     fs.existsSync(ticketsPath) &&
-    JSON.parse(fs.readFileSync(ticketsPath).toString())
+      JSON.parse(fs.readFileSync(ticketsPath).toString())
   );
 }
 
