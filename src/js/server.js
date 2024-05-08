@@ -133,7 +133,7 @@ function deleteById(context, next) {
   const id = getId(context.request);
   context.response.set("Access-Control-Allow-Origin", "*");
   const index = tickets.findIndex((t) => t.id === id);
-  if (!index) {
+  if (index < 0) {
     context.response.status = 404;
     context.response.body = "Not Found";
   } else {
