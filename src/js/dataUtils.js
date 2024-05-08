@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-const ticketsPath = "./data/tickets.json";
+const ticketsPath = "./tickets.json";
 export function loadTickets() {
   return (
     fs.existsSync(ticketsPath) &&
